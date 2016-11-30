@@ -43,7 +43,7 @@
 	9	low battery indicator
 	12	1 indicates TX button press on sensor
 	17-24	humidity
-	25-36	temperature (signed int12)
+	25-36	temperature
 */
 
 typedef struct settings_t {
@@ -217,7 +217,7 @@ void tcmInit(void) {
 #if defined(MODULE) && !defined(_WIN32)
 void compatibility(struct module_t *module) {
 	module->name = "tcm";
-	module->version = "1.2";
+	module->version = "1.1";
 	module->reqversion = "6.0";
 	module->reqcommit = "84";
 }
