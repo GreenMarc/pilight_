@@ -19,7 +19,7 @@ var aTimers = new Array();
 var sDateTimeFormat = "HH:mm:ss YYYY-MM-DD";
 var aDateTimeFormats = new Array();
 var aWebcamUrl = new Array();
-var aDecimalTypes = ["temperature", "humidity", "wind", "pressure", "sunriseset","illuminance"];
+var aDecimalTypes = ["temperature", "humidity", "wind", "pressure", "sunriseset"];
 var userLang = navigator.language || navigator.userLanguage;
 var language;
 
@@ -604,9 +604,6 @@ function createWeatherElement(sTabId, sDevId, aValues) {
 			$('#'+sDevId+'_sunrise_icon').addClass('yellow');
 			$('#'+sDevId+'_sunset_icon').addClass('gray');
 		}
-		if('show-illuminance' in aValues && aValues['show-illuminance']) {
-			oTab.find('#'+sDevId+'_weather').append($('<div class="illuminance_icon"></div><div class="illuminance" id="'+sDevId+'_illu"></div>'));
-		}
 	}
 	oTab.listview();
 	oTab.listview("refresh");
@@ -1045,10 +1042,6 @@ function parseValues(data) {
 							if($('#'+dvalues+'_sunset_icon').attr("class").indexOf("blue") == -1) {
 								$('#'+dvalues+'_sunset_icon').removeClass('gray').addClass('blue');
 							}
-						}
-					} else if(vindex == 'illuminance' && $('#'+dvalues+'_illu').length > 0) {
-						if(dvalues in aDecimals) {
-							$('#'+dvalues+'_illu').text(vvalues.toFixed(aDecimals[dvalues]['illuminance']));
 						}
 					} else if(vindex == 'update' && $('#'+dvalues+'_upd').length > 0) {
 						if(vvalues == 0) {
