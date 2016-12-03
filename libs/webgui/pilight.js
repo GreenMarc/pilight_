@@ -19,7 +19,7 @@ var aTimers = new Array();
 var sDateTimeFormat = "HH:mm:ss YYYY-MM-DD";
 var aDateTimeFormats = new Array();
 var aWebcamUrl = new Array();
-var aDecimalTypes = ["temperature", "humidity", "wind", "pressure", "sunriseset","illuminance"];
+var aDecimalTypes = ["temperature", "humidity", "wind", "pressure", "sunriseset", "illuminance"];
 var userLang = navigator.language || navigator.userLanguage;
 var language;
 

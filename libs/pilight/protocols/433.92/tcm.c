@@ -93,11 +93,9 @@ static void parseCode(void) {
 	humidity = binToDecRev(binary, 16, 23);
 
 	temp = binToDecRev(binary, 24, 35);
-
 	if(binary[24]) {
 		temp -= 4096;
 	}
-
 	temperature = temp;
 
 	struct settings_t *tmp = settings;
