@@ -220,27 +220,27 @@ static void *thread(void *param) {
 			bme280data->dig_H6[y] = (char) wiringXI2CReadReg8(bme280data->fd[y],0xe7);
 
 			// check communication: no result must equal 0 or 0xFFFF (=65535)
-			if (bme280data->dig_T1[y] == 0 || bme280data->dig_T1[y] == 0xFFFF ||
-				  bme280data->dig_T2[y] == 0 || bme280data->dig_T2[y] == 0xFFFF ||
-				  bme280data->dig_T3[y] == 0 || bme280data->dig_T3[y] == 0xFFFF ||
-				  bme280data->dig_P1[y] == 0 || bme280data->dig_P1[y] == 0xFFFF ||
-				  bme280data->dig_P2[y] == 0 || bme280data->dig_P2[y] == 0xFFFF ||
-				  bme280data->dig_P3[y] == 0 || bme280data->dig_P3[y] == 0xFFFF ||
-				  bme280data->dig_P4[y] == 0 || bme280data->dig_P4[y] == 0xFFFF ||
-				  bme280data->dig_P5[y] == 0 || bme280data->dig_P5[y] == 0xFFFF ||
-				  bme280data->dig_P6[y] == 0 || bme280data->dig_P6[y] == 0xFFFF ||
-				  bme280data->dig_P7[y] == 0 || bme280data->dig_P7[y] == 0xFFFF ||
-				  bme280data->dig_P8[y] == 0 || bme280data->dig_P8[y] == 0xFFFF ||
-				  bme280data->dig_P9[y] == 0 || bme280data->dig_P9[y] == 0xFFFF ||
-				  bme280data->dig_H1[y] == 0 || bme280data->dig_H1[y] == 0xFFFF ||
-				  bme280data->dig_H2[y] == 0 || bme280data->dig_H2[y] == 0xFFFF ||
-				  bme280data->dig_H3[y] == 0 || bme280data->dig_H3[y] == 0xFFFF ||
-				  bme280data->dig_H4[y] == 0 || bme280data->dig_H4[y] == 0xFFFF ||
-				  bme280data->dig_H5[y] == 0 || bme280data->dig_H5[y] == 0xFFFF ||
-				  bme280data->dig_H6[y] == 0 || bme280data->dig_H6[y] == 0xFFFF ){
-				logprintf(LOG_ERR, "data communication error");
-				exit(EXIT_FAILURE);
-			}
+			//if (bme280data->dig_T1[y] == 0 || bme280data->dig_T1[y] == 0xFFFF ||
+			//	  bme280data->dig_T2[y] == 0 || bme280data->dig_T2[y] == 0xFFFF ||
+			//	  bme280data->dig_T3[y] == 0 || bme280data->dig_T3[y] == 0xFFFF ||
+			//	  bme280data->dig_P1[y] == 0 || bme280data->dig_P1[y] == 0xFFFF ||
+			//	  bme280data->dig_P2[y] == 0 || bme280data->dig_P2[y] == 0xFFFF ||
+			//	  bme280data->dig_P3[y] == 0 || bme280data->dig_P3[y] == 0xFFFF ||
+			//	  bme280data->dig_P4[y] == 0 || bme280data->dig_P4[y] == 0xFFFF ||
+			//	  bme280data->dig_P5[y] == 0 || bme280data->dig_P5[y] == 0xFFFF ||
+			//	  bme280data->dig_P6[y] == 0 || bme280data->dig_P6[y] == 0xFFFF ||
+			//	  bme280data->dig_P7[y] == 0 || bme280data->dig_P7[y] == 0xFFFF ||
+			//	  bme280data->dig_P8[y] == 0 || bme280data->dig_P8[y] == 0xFFFF ||
+			//	  bme280data->dig_P9[y] == 0 || bme280data->dig_P9[y] == 0xFFFF ||
+			//	  bme280data->dig_H1[y] == 0 || bme280data->dig_H1[y] == 0xFFFF ||
+			//	  bme280data->dig_H2[y] == 0 || bme280data->dig_H2[y] == 0xFFFF ||
+			//	  bme280data->dig_H3[y] == 0 || bme280data->dig_H3[y] == 0xFFFF ||
+			//	  bme280data->dig_H4[y] == 0 || bme280data->dig_H4[y] == 0xFFFF ||
+			//	  bme280data->dig_H5[y] == 0 || bme280data->dig_H5[y] == 0xFFFF ||
+			//	  bme280data->dig_H6[y] == 0 || bme280data->dig_H6[y] == 0xFFFF ){
+			//	logprintf(LOG_ERR, "data communication error");
+			//	exit(EXIT_FAILURE);
+			//}
 		}
 	}
 
