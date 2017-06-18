@@ -47,6 +47,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <wiringx.h>
 
 #include "libs/pilight/core/pilight.h"
 #include "libs/pilight/core/threads.h"
@@ -83,7 +84,6 @@
 #include "libs/pilight/config/settings.h"
 #include "libs/pilight/config/gui.h"
 
-#include "libs/wiringx/wiringX.h"
 
 #ifdef _WIN32
 static char server_name[40];
@@ -2089,8 +2089,6 @@ int start_pilight(int argc, char **argv) {
 	char *stmp = NULL, *args = NULL, *p = NULL;
 	int port = 0;
 
-	wiringXLog = logprintf;
-
 	if((progname = MALLOC(16)) == NULL) {
 		fprintf(stderr, "out of memory\n");
 		exit(EXIT_FAILURE);
@@ -2193,6 +2191,19 @@ int start_pilight(int argc, char **argv) {
 		MessageBox(NULL, help, "pilight :: info", MB_OK);
 #else
 		printf("%s", help);
+#if defined(__arm__) || defined(__mips__)
+		printf("\n\tThe following GPIO platforms are supported:\n");
+		char **out = NULL;
+		int z = 0, i = wiringXSupportedPlatforms(&out);
+
+		printf("\t- none\n");
+		for(z=0;z<i;z++) {
+			printf("\t- %s\n", out[z]);
+			free(out[z]);
+		}
+		free(out);
+		printf("\n");
+#endif
 #endif
 		goto clear;
 	}
