@@ -32,6 +32,7 @@
 		#define __USE_UNIX98
 	#endif
 #endif
+#include <wiringx.h>
 #include <pthread.h>
 
 #include "../../core/pilight.h"
@@ -42,9 +43,7 @@
 #include "../../core/binary.h"
 #include "../../core/gc.h"
 #include "../../core/json.h"
-#ifndef _WIN32
-	#include "../../../wiringx/wiringX.h"
-#endif
+#include "../../config/settings.h"
 #include "../protocol.h"
 #include "tsl2561.h"
 
@@ -52,6 +51,7 @@
 typedef struct settings_t {
 	char **id;
 	int nrid;
+	char path[PATH_MAX];
 	int *fd;
 } settings_t;
 
@@ -172,7 +172,7 @@ static void *thread(void *param) {
 		jchild = json_first_child(jid);
 		while(jchild) {
 			if(json_find_string(jchild, "id", &stmp) == 0) {
-				if((tsl2561data->id = REALLOC(tsl2561data->id, (sizeof(char *)*(size_t)(tsl2561data->nrid+1)))) == NULL) {
+				if((tsl2561data->id = REALLOC(tsl2561data->id, (sizeof(char *) * (size_t)(tsl2561data->nrid+1)))) == NULL) {
 					fprintf(stderr, "out of memory\n");
 					exit(EXIT_FAILURE);
 				}
@@ -183,6 +183,9 @@ static void *thread(void *param) {
 				strcpy(tsl2561data->id[tsl2561data->nrid], stmp);
 				tsl2561data->nrid++;
 			}
+			if(json_find_string(jchild, "i2c-path", &stmp) == 0) {
+				strcpy(tsl2561data->path, stmp);
+			}		
 			jchild = jchild->next;
 		}
 	}
@@ -199,7 +202,7 @@ static void *thread(void *param) {
 	}
 
 	for(y=0;y<tsl2561data->nrid;y++) {
-		tsl2561data->fd[y] = wiringXI2CSetup((int)strtol(tsl2561data->id[y], NULL, 16));
+		tsl2561data->fd[y] = wiringXI2CSetup(tsl2561data->path, (int)strtol(tsl2561data->id[y], NULL, 16));
 	}
 
 	while(loop) {
@@ -261,7 +264,12 @@ static void *thread(void *param) {
 }
 
 static struct threadqueue_t *initDev(JsonNode *jdevice) {
-	if(wiringXSupported() == 0 && wiringXSetup() == 0) {
+	char *platform = GPIO_PLATFORM;
+	if(settings_find_string("gpio-platform", &platform) != 0 || strcmp(platform, "none") == 0) {
+		logprintf(LOG_ERR, "gpio_switch: no gpio-platform configured");
+		exit(EXIT_FAILURE);
+	}
+	if(wiringXSetup(platform,logprintf1) == 0) {
 		loop = 1;
 		char *output = json_stringify(jdevice, NULL);
 		JsonNode *json = json_decode(output);
@@ -304,6 +312,7 @@ void tsl2561Init(void) {
 	
 	options_add(&tsl2561->options, 'i', "id", OPTION_HAS_VALUE, DEVICES_ID, JSON_STRING, NULL, "0x[0-9a-fA-F]{2}");
 	options_add(&tsl2561->options, 'e', "illuminance", OPTION_HAS_VALUE, DEVICES_VALUE, JSON_NUMBER, NULL, "^[0-9]{1}$");
+	options_add(&tsl2561->options, 'd', "i2c-path", OPTION_HAS_VALUE, DEVICES_ID, JSON_STRING, NULL, "^/dev/i2c-[0-9]{1,2}$");	
 	options_add(&tsl2561->options, 0, "packagetype", OPTION_HAS_VALUE, DEVICES_SETTING, JSON_NUMBER, (void *)0, "^[10]{1}$");
 	options_add(&tsl2561->options, 0, "poll-interval", OPTION_HAS_VALUE, DEVICES_SETTING, JSON_NUMBER, (void *)10, "[0-9]");
 	options_add(&tsl2561->options, 0, "show-illuminance", OPTION_HAS_VALUE, GUI_SETTING, JSON_NUMBER, (void *)1, "^[10]{1}$");

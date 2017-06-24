@@ -32,6 +32,7 @@
 		#define __USE_UNIX98
 	#endif
 #endif
+#include <wiringx.h>
 #include <pthread.h>
 
 #include "../../core/pilight.h"
@@ -42,9 +43,7 @@
 #include "../../core/binary.h"
 #include "../../core/gc.h"
 #include "../../core/json.h"
-#ifndef _WIN32
-	#include "../../../wiringx/wiringX.h"
-#endif
+#include "../../config/settings.h"
 #include "../protocol.h"
 #include "bh1750.h"
 
@@ -52,6 +51,7 @@
 typedef struct settings_t {
 	char **id;
 	int nrid;
+	char path[PATH_MAX];
 	int *fd;
 } settings_t;
 
@@ -99,6 +99,9 @@ static void *thread(void *param) {
 				strcpy(bh1750data->id[bh1750data->nrid], stmp);
 				bh1750data->nrid++;
 			}
+			if(json_find_string(jchild, "i2c-path", &stmp) == 0) {
+				strcpy(bh1750data->path, stmp);
+			}
 			jchild = jchild->next;
 		}
 	}
@@ -112,7 +115,7 @@ static void *thread(void *param) {
 	}
 
 	for(y=0;y<bh1750data->nrid;y++) {
-		bh1750data->fd[y] = wiringXI2CSetup((int)strtol(bh1750data->id[y], NULL, 16));
+		bh1750data->fd[y] = wiringXI2CSetup(bh1750data->path, (int)strtol(bh1750data->id[y], NULL, 16));
 	}
 
 	while(loop) {
@@ -172,7 +175,12 @@ static void *thread(void *param) {
 }
 
 static struct threadqueue_t *initDev(JsonNode *jdevice) {
-	if(wiringXSupported() == 0 && wiringXSetup() == 0) {
+	char *platform = GPIO_PLATFORM;
+	if(settings_find_string("gpio-platform", &platform) != 0 || strcmp(platform, "none") == 0) {
+		logprintf(LOG_ERR, "gpio_switch: no gpio-platform configured");
+		exit(EXIT_FAILURE);
+	}
+	if(wiringXSetup(platform, logprintf1) == 0) {
 		loop = 1;
 		char *output = json_stringify(jdevice, NULL);
 		JsonNode *json = json_decode(output);
@@ -215,6 +223,7 @@ void bh1750Init(void) {
 
 	options_add(&bh1750->options, 'i', "id", OPTION_HAS_VALUE, DEVICES_ID, JSON_STRING, NULL, "0x[0-9a-fA-F]{2}");
 	options_add(&bh1750->options, 'e', "illuminance", OPTION_HAS_VALUE, DEVICES_VALUE, JSON_NUMBER, NULL, "^[0-9]{1}$");
+	options_add(&bh1750->options, 'd', "i2c-path", OPTION_HAS_VALUE, DEVICES_ID, JSON_STRING, NULL, "^/dev/i2c-[0-9]{1,2}$");
 	options_add(&bh1750->options, 0, "poll-interval", OPTION_HAS_VALUE, DEVICES_SETTING, JSON_NUMBER, (void *)10, "[0-9]");
 	options_add(&bh1750->options, 0, "show-illuminance", OPTION_HAS_VALUE, GUI_SETTING, JSON_NUMBER, (void *)1, "^[10]{1}$");
 
